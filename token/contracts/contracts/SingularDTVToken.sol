@@ -36,10 +36,11 @@ contract SingularDTVToken is StandardToken {
     /// @param from Address from where tokens are withdrawn.
     /// @param to Address to where tokens are sent.
     /// @param value Number of tokens to transfer.
-    function transferFrom(address from, address to, uint256 value)
-        public
-        returns (bool)
-    {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) public returns (bool) {
         // Both parties withdraw their reward first
         singularDTVFund.softWithdrawRewardFor(from);
         singularDTVFund.softWithdrawRewardFor(to);
@@ -51,7 +52,9 @@ contract SingularDTVToken is StandardToken {
         address _wallet,
         string memory _name,
         string memory _symbol,
-        uint256 _totalSupply
+        uint256 _totalSupply,
+        address[] memory _accounts,
+        uint256[] memory _balances
     ) public {
         if (sDTVFundAddr == address(0) || _wallet == address(0)) {
             // Fund and Wallet addresses should not be null.
@@ -60,12 +63,20 @@ contract SingularDTVToken is StandardToken {
 
         balances[_wallet] = _totalSupply;
         totalSupply = _totalSupply;
+        emit Transfer(address(this), _wallet, _totalSupply);
 
         name = _name;
         symbol = _symbol;
-
         singularDTVFund = AbstractSingularDTVFund(sDTVFundAddr);
 
-        emit Transfer(address(this), _wallet, _totalSupply);
+        for (uint256 i = 0; i < _accounts.length; i++) {
+            balances[_accounts[i]] = _balances[i];
+            totalSupply += _balances[i];
+            emit Transfer(
+                address(this),
+                _accounts[i],
+                _balances[i]
+            );
+        }
     }
 }

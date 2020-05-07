@@ -5,20 +5,24 @@ const getBalancesNotConfigured = require("./getBalances");
 const {
     eventName,
     getPastEventsOptions,
-    optionsOldContractAddress,
+    oldContractAddress,
     oldContractBuildFileName,
-    optionsNewContractAddress,
+    newContractAddress,
     newContractBuildFileName,
     providerAddress,
     mnemonic,
     oldDecimals,
     newDecimals
 } = require('./options');
+console.log(`old address: ${oldContractAddress}`);
+console.log(`new address: ${newContractAddress}`);
 
+const optionsOldContractAddress = oldContractAddress;
+const optionsNewContractAddress = newContractAddress;
 
 const provider = new HDWalletProvider(mnemonic, providerAddress);
-const web3 = new Web3(provider);
-const BN = web3.utils.BN;
+const optionsWeb3 = new Web3(provider);
+const BN = Web3.utils.BN;
 
 const oldBuild = JSON.parse(fs.readFileSync(oldContractBuildFileName));
 const oldAbi = oldBuild.abi;
@@ -31,8 +35,11 @@ const oldDecimalsFactor = (new BN("10")).pow(new BN(oldDecimals));
 const newDecimalsFactor = (new BN("10")).pow(new BN(newDecimals));
 const decimalsCoefficient = (new BN("10")).pow(new BN(oldDecimals - newDecimals));
 
-module.exports = async function airdrop(oldContractAddress = optionsOldContractAddress, newContractAddress = optionsNewContractAddress, web3, accounts) {
+
+module.exports = async function airdrop(web3 = optionsWeb3, oldContractAddress = optionsOldContractAddress, newContractAddress = optionsNewContractAddress) {
+
     console.log(`Start preparing for airdrop\n`);
+    const accounts = await web3.eth.getAccounts();
 
     const eth = web3.eth;
     // const accounts = await web3.eth.getAccounts();
@@ -61,14 +68,14 @@ module.exports = async function airdrop(oldContractAddress = optionsOldContractA
     const sumInNewDecimals = sum.mul(decimalsCoefficient);
 
 
-    let tokSup = await newToken.methods.balanceOf(masterAcc).call();
-    const newTokensSupply = new BN(tokSup);
+    // let tokSup = await newToken.methods.balanceOf(masterAcc).call();
+    const newTokensSupply = new BN(8);
     //check if we have enough tokens to airdrop
     if (newTokensSupply.lt(sum)) throw new Error(`Not enough new tokens to airdrop. Required number of tokens: ${sum.toString()}, available number of tokens: ${newTokensSupply.toString()}`);
     console.log("Enough new tokens to airdrop.");
     console.log("Check if estimated balances equals to values on chain.");
     for (const addr in balancesOld) {
-        if (balancesOld.hasOwnProperty(addr)) {
+        if (balancesOld.hasOwnProperty(addr) && !!addr) {
             const value = balancesOld[addr];
             if (value.isNeg()) continue;
             const onChainValue = new BN(await oldToken.methods.balanceOf(addr).call());
@@ -87,6 +94,7 @@ module.exports = async function airdrop(oldContractAddress = optionsOldContractA
             const oldValue = balancesOld[addr];
             const newValue = oldValue.mul(decimalsCoefficient)
             if (newValue.isNeg()) continue;
+            console.log(`Estimate transfer -- address:${addr}`);
 
             balancesNew[addr] = newValue;
             estimatedGas.iadd(new BN(await newToken.methods.transfer(addr, newValue.toString()).estimateGas({

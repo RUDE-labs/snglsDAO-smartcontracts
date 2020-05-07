@@ -1,0 +1,58 @@
+{
+  "name": "sngldao",
+  "version": "1.0.0",
+  "description": "DAO for sngl",
+  "scripts": {
+    "compile": "truffle compile",
+    "deploy-graph": "bash ops/hackyDeploy.sh",
+    "network": "ganache-cli",
+    "set-migration-settings": "node ./scripts/setLockingTokenStartTime.js",
+    "set-rinkeby": "node ./scripts/setRinkebyDeployOptions.js",
+    "set-private": "node ./scripts/setPrivateDeployOptions.js",
+    "migrate": "npm run set-migration-settings && node migrations/MigrateDAO.js",
+    "deploy-singular": "npm run set-private && cd ../token/contracts && npm run migrate",
+    "airdrop": "npm run set-private && cd ../token/airdrop && truffle test ./script/doAirdropFromOptions.js &&cd ../../dao-contracts && npm run show-balances",
+    "show-balances": "npm run set-private && truffle test ./scripts/showBalances.js",
+    "test": "npm run set-private && truffle test",
+    "start": "npm run set-private && npm run docker && npm run compile && npm run migrate && npm run deploy-singular && npm run airdrop",
+    "start-test": "npm run set-private && npm run docker && npm run compile && npm run migrate && npm run deploy-singular && npm run airdrop && npm run test",
+    "restart": "npm run set-private && npm run docker-restart && npm run compile && npm run migrate && npm run deploy-singular && npm run airdrop",
+    "restart-test": "npm run set-private && npm run docker-restart && npm run compile && npm run migrate && npm run deploy-singular && npm run airdrop && npm run test",
+    "test-rinkeby": "npm run set-rinkeby && truffle test --network rinkeby",
+    "deploy-singular-rinkeby": "npm run set-rinkeby && cd ../token/contracts && npm run migrate-rinkeby",
+    "airdrop-rinkeby": "npm run set-rinkeby && cd ../token/airdrop && truffle test ./script/doAirdropFromOptions.js --network rinkeby &&cd ../../dao-contracts && npm run show-balances-rinkeby",
+    "show-balances-rinkeby": "npm run set-rinkeby && truffle test ./scripts/showBalances.js --network rinkeby ",
+    "start-rinkeby": "npm run set-rinkeby && npm run migrate && npm run deploy-singular-rinkeby && npm run airdrop-rinkeby",
+    "start-test-rinkeby": "npm run set-rinkeby && npm run compile && npm run migrate && npm run deploy-singular-rinkeby && npm run airdrop-rinkeby && npm run test-rinkeby",
+    "docker": "docker-compose up -d graph-node",
+    "docker-down": "docker-compose down",
+    "docker-restart": "npm run docker-down && npm run docker"
+  },
+  "keywords": [
+    "DAO",
+    "DAOStack",
+    "SNGL",
+    "Ethereum",
+    "Blockchain"
+  ],
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@daostack/arc": "0.0.1-rc.39",
+    "@daostack/infra": "0.0.1-rc.17",
+    "@daostack/migration": "0.0.1-rc.39-v3",
+    "@daostack/subgraph": "0.0.37-3",
+    "@truffle/hdwallet-provider": "^1.0.34",
+    "dotenv": "^8.2.0",
+    "node": "^8.10.0",
+    "openzeppelin-solidity": "^2.1.3",
+    "prettier": "^2.0.4",
+    "prettier-plugin-solidity": "^1.0.0-alpha.48",
+    "truffle": "^5.1.13",
+    "websocket": "^1.0.31"
+  },
+  "devDependencies": {
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2"
+  }
+}

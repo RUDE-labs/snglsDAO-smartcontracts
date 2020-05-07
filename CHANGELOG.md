@@ -1,5 +1,50 @@
 # Changelog
 
+## [1.0.6] - 2020-05-06
+
+### Added
+
+- Pulling commission information from contracts
+- Blocks with information about commissions
+
+### Changed
+
+- General page style
+- Fixed bug in the functionality of creating new offers
+
+## [1.0.5] - 2020-04-28
+
+### Added
+
+- Dashboard page added
+
+### Changed
+
+- Application routing rules changed
+
+## [1.0.4] - 2020-04-21
+
+### Added
+
+- Added reputation contract in migration script
+
+### Changed
+
+- DAO opening immediately in a detailed form
+
+## [1.0.3] - 2020-04-06
+
+### Added
+
+- DAO configuration file.
+- Scenario of migration of DAO to a private network.
+- Description of migration error prevention in README.
+
+### Changed
+
+- Alchemy web application 10.3
+- Migrations using standard DAOstack tools
+
 ## [1.0.2] - 2020-03-26
 
 ### Added
